@@ -1,15 +1,21 @@
 import { z } from "zod";
 
+export const optionalTextSchema = z.preprocess(
+  (value) => (value === "" ? undefined : value),
+  z.string().optional(),
+);
 const requiredString = z.string().trim().min(1);
-const optionalUrl = z.preprocess(
+export const optionalUrlSchema = z.preprocess(
   (value) => (value === "" ? undefined : value),
   z.string().url().optional(),
 );
-const month = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, "Use YYYY-MM format");
-const optionalMonth = z.preprocess(
+export const monthSchema = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, "Use YYYY-MM format");
+export const optionalMonthSchema = z.preprocess(
   (value) => (value === "" ? undefined : value),
-  month.optional(),
+  monthSchema.optional(),
 );
+
+export const cvTemplateIdSchema = z.enum(["european-tech", "australian-professional"]);
 
 export const personalDetailsSchema = z.object({
   fullName: requiredString,
@@ -17,21 +23,23 @@ export const personalDetailsSchema = z.object({
   email: z.string().email(),
   phone: z.string().optional(),
   location: z.string().optional(),
-  website: optionalUrl,
-  linkedin: optionalUrl,
-  github: optionalUrl,
+  website: optionalUrlSchema,
+  linkedin: optionalUrlSchema,
+  github: optionalUrlSchema,
 });
 
 export const workExperienceSchema = z.object({
   id: requiredString,
   company: requiredString,
   position: requiredString,
-  location: z.string().optional(),
-  startDate: month,
-  endDate: optionalMonth,
+  location: optionalTextSchema,
+  startDate: monthSchema,
+  endDate: optionalMonthSchema,
   isCurrent: z.boolean(),
-  description: z.string().optional(),
-  highlights: z.array(z.string()),
+  description: optionalTextSchema,
+  responsibilities: z.array(z.string()),
+  achievements: z.array(z.string()),
+  technologies: z.array(z.string()),
 });
 
 export const educationSchema = z.object({
@@ -40,8 +48,8 @@ export const educationSchema = z.object({
   degree: requiredString,
   fieldOfStudy: z.string().optional(),
   location: z.string().optional(),
-  startDate: optionalMonth,
-  endDate: optionalMonth,
+  startDate: optionalMonthSchema,
+  endDate: optionalMonthSchema,
   isCurrent: z.boolean(),
   grade: z.string().optional(),
   highlights: z.array(z.string()),
@@ -52,10 +60,10 @@ export const projectSchema = z.object({
   name: requiredString,
   role: z.string().optional(),
   description: z.string().optional(),
-  url: optionalUrl,
-  repositoryUrl: optionalUrl,
-  startDate: optionalMonth,
-  endDate: optionalMonth,
+  url: optionalUrlSchema,
+  repositoryUrl: optionalUrlSchema,
+  startDate: optionalMonthSchema,
+  endDate: optionalMonthSchema,
   technologies: z.array(z.string()),
   highlights: z.array(z.string()),
 });
@@ -70,8 +78,8 @@ export const certificationSchema = z.object({
   id: requiredString,
   name: requiredString,
   issuer: z.string().optional(),
-  issueDate: optionalMonth,
-  credentialUrl: optionalUrl,
+  issueDate: optionalMonthSchema,
+  credentialUrl: optionalUrlSchema,
 });
 
 export const languageSchema = z.object({
@@ -94,10 +102,20 @@ export const customSectionSchema = z.object({
   items: z.array(customSectionItemSchema),
 });
 
+export const referenceSchema = z.object({
+  id: requiredString,
+  name: optionalTextSchema,
+  position: optionalTextSchema,
+  company: optionalTextSchema,
+  email: z.preprocess((value) => (value === "" ? undefined : value), z.string().email().optional()),
+  phone: optionalTextSchema,
+  isAvailableOnRequest: z.boolean(),
+});
+
 export const cvSchema = z.object({
   id: requiredString,
   name: requiredString,
-  templateId: requiredString.default("classic"),
+  templateId: cvTemplateIdSchema.default("european-tech"),
   personalDetails: personalDetailsSchema,
   professionalSummary: z.string(),
   workExperience: z.array(workExperienceSchema),
@@ -106,6 +124,8 @@ export const cvSchema = z.object({
   skillGroups: z.array(skillGroupSchema),
   certifications: z.array(certificationSchema),
   languages: z.array(languageSchema),
+  interests: z.array(z.string()),
+  references: z.array(referenceSchema),
   customSections: z.array(customSectionSchema),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
@@ -120,6 +140,8 @@ export type Certification = z.infer<typeof certificationSchema>;
 export type Language = z.infer<typeof languageSchema>;
 export type CustomSectionItem = z.infer<typeof customSectionItemSchema>;
 export type CustomSection = z.infer<typeof customSectionSchema>;
+export type Reference = z.infer<typeof referenceSchema>;
+export type CvTemplateId = z.infer<typeof cvTemplateIdSchema>;
 export type Cv = z.infer<typeof cvSchema>;
 
 export function createId(): string {
@@ -136,8 +158,8 @@ export function createEmptyCv(id = createId()): Cv {
   return {
     id,
     name: "Untitled CV",
-    templateId: "classic",
-    personalDetails: { fullName: "", email: "" },
+    templateId: "european-tech",
+    personalDetails: { fullName: "Your Name", email: "you@example.com" },
     professionalSummary: "",
     workExperience: [],
     education: [],
@@ -145,6 +167,8 @@ export function createEmptyCv(id = createId()): Cv {
     skillGroups: [],
     certifications: [],
     languages: [],
+    interests: [],
+    references: [],
     customSections: [],
     createdAt: timestamp,
     updatedAt: timestamp,

@@ -22,8 +22,8 @@ export function CvLibraryToolbar({ searchQuery, sortBy, template, onSearch, onSo
         <span className="sr-only">Filter by template</span>
         <Select value={template} onChange={(event) => onTemplate(event.target.value)} className="w-full sm:w-auto">
           <option value="all">All templates</option>
-          <option value="classic">Classic</option>
-          <option value="modern">Modern</option>
+          <option value="european-tech">European Tech</option>
+          <option value="australian-professional">Australian Professional</option>
         </Select>
       </label>
       <label>

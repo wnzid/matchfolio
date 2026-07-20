@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Badge } from "../ui/Badge";
 import { DropdownItem, DropdownMenu } from "../ui/DropdownMenu";
 
-const templateNames: Record<string, string> = { classic: "Classic", modern: "Modern" };
+const templateNames: Record<string, string> = { "european-tech": "European Tech", "australian-professional": "Australian Professional" };
 
 export function CvCard({ cv, onDelete, onDuplicate, onRename }: { cv: Cv; onDelete: () => void; onDuplicate: () => void; onRename: (name: string) => void }) {
   const updated = new Intl.DateTimeFormat("en", { day: "numeric", month: "short", year: "numeric" }).format(new Date(cv.updatedAt));
@@ -17,7 +17,7 @@ export function CvCard({ cv, onDelete, onDuplicate, onRename }: { cv: Cv; onDele
     <article className="group flex min-w-0 flex-col rounded-xl border border-slate-200 bg-white p-5 transition hover:border-slate-300 hover:shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <Badge appearance={cv.id.startsWith("master-") ? "accent" : "neutral"}>{cv.id.startsWith("master-") ? "Master" : "Tailored"}</Badge>
+          <Badge appearance={cv.name.toLowerCase().includes("master") ? "accent" : "neutral"}>{cv.name.toLowerCase().includes("master") ? "Master" : "CV"}</Badge>
           <h3 className="mt-3 line-clamp-2 text-base font-bold leading-6 text-slate-900">{cv.name}</h3>
         </div>
         <DropdownMenu>
