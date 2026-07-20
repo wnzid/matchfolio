@@ -1,0 +1,19 @@
+{
+  "name": "matchfolio",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=@matchfolio/client\" \"npm run dev --workspace=@matchfolio/server\"",
+    "dev:client": "npm run dev --workspace=@matchfolio/client",
+    "dev:server": "npm run dev --workspace=@matchfolio/server",
+    "build": "npm run build --workspace=@matchfolio/client && npm run build --workspace=@matchfolio/server",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}
